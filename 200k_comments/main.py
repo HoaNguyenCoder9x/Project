@@ -4,7 +4,7 @@ from utilities import convert_unidecode, modified_string, count_str
 import numpy as np
 import duckdb 
 from unidecode import unidecode
-
+from sqlalchemy import create_engine
 
 
     
@@ -83,20 +83,27 @@ def processing(df):
     return df
     
 
-def write_sink():
+def write_sink(df , db_type = 'duckdb'):
     """
     write data from DF to DuckDB
     """
 
-
-    with duckdb.connect('uat_database.duckdb') as conn:
-        conn.execute(f'create table if not exists social_comments as select * from df')
-        tables = conn.execute("SELECT * FROM information_schema.tables WHERE table_schema = 'main';").fetchdf()
-        print(tables)
-        data = conn.execute('select * from social_comments order by relate_points desc').fetch_df()        
+    if db_type == 'duckdb':
+        with duckdb.connect('uat_database.duckdb') as conn:
+            conn.execute(f'create table if not exists social_comments as select * from df')
+            tables = conn.execute("SELECT * FROM information_schema.tables WHERE table_schema = 'main';").fetchdf()
+            print(tables)
+            data = conn.execute('select * from social_comments order by relate_points desc').fetch_df()        
+        
+        return data
     
-    return data
-
+    elif db_type == 'mysql':
+        engine = create_engine(mysql_connection)
+        df.to_sql('social_cmt_tbl',engine, if_exists='replace', index=False)
+        print("Data has been written to the MySQL database successfully.")
+        data = pd.read_sql_query('select * from social_cmt_tbl limit 5',engine)
+        return data
+    
 
 
 
@@ -108,6 +115,7 @@ print(f'Current working dir: {os.getcwd()}')
 # Variables
 file_path = '200k_comments.csv'
 list_key_words = ['vc','thuy tien','cong vinh', 'bao lu','cong vien thuy tinh','mien trung','tu thien','vo chong']
+mysql_connection = os.getenv('MYSQL_CONNECTION_STRING')
 
 
 # Extract
@@ -115,7 +123,7 @@ data = read_source(file_path)
 # Transform
 df = processing(data)
 # Load
-sink = write_sink()
+sink = write_sink(df = df, db_type= 'mysql')
 
 
 # OUT TO CONSOLE
