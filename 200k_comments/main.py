@@ -3,6 +3,7 @@ import pandas as pd
 from utilities import convert_unidecode, modified_string, count_str
 import numpy as np
 import duckdb 
+from unidecode import unidecode
 
 
 
@@ -40,8 +41,10 @@ def processing(df):
     
     """
     # ADD COL: ascii_comments 
-    df['ascii_comments'] = df['comments'].apply(convert_unidecode)
+    # df['ascii_comments'] = df['comments'].apply(convert_unidecode)
+    df['ascii_comments'] = df['comments'].apply(lambda r: unidecode(r).lower())
     
+
     # ADD COL: Keywords
     # xử lý columnns keyword
     list_key_words = ['vc','thuy tien','cong vinh', 'bao lu','cong vien thuy tinh','mien trung','tu thien','vo chong']
@@ -97,6 +100,7 @@ def write_sink():
 
 
 
+
 os.chdir('/home/dev_shyn/data/Project/200k_comments')
 print(f'Current working dir: {os.getcwd()}')
 # /home/dev_shyn/data/Project/200k_comments
@@ -117,6 +121,6 @@ sink = write_sink()
 # OUT TO CONSOLE
 print(df.columns)
 print(df.shape)
-print(sink)
-print(sink)
+print(sink[['ascii_comments']])
+
 

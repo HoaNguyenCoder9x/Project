@@ -32,3 +32,4 @@ def count_str(text):
         return int(text_to_dict['kw'])
     else:
         return 0
+    
