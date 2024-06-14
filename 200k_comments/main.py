@@ -90,7 +90,7 @@ def write_sink():
         conn.execute(f'create table if not exists social_comments as select * from df')
         tables = conn.execute("SELECT * FROM information_schema.tables WHERE table_schema = 'main';").fetchdf()
         print(tables)
-        data = conn.execute('select * from social_comments').fetch_df()        
+        data = conn.execute('select * from social_comments order by relate_points desc').fetch_df()        
     
     return data
 
