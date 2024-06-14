@@ -1,5 +1,5 @@
 from unidecode import unidecode
-
+from collections import Counter
 # For create py env 
 # Step 2: Create a virtual environment
 # python3 -m venv myenv
@@ -23,7 +23,7 @@ def modified_string(string):
 
 def count_str(text):
     if 'kw' in text:
-        from collections import Counter
+        
         text = text.replace(',' , ' ')
         text = text.replace('_' , ' ')
         text_to_list = text.split()
